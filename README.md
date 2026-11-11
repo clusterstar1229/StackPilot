@@ -1,97 +1,119 @@
 # 栈桥 StackPilot 0.2.0
 
-[源码仓库](https://github.com/clusterstar1229/StackPilot) · [Windows 安装包下载](http://47.109.34.123:18080/) · [版本记录](CHANGELOG.md)
+[源码仓库](https://github.com/clusterstar1229/StackPilot) · [Windows 安装包](http://47.109.34.123:18080/) · [版本记录](CHANGELOG.md)
 
-面向个人管理数台服务器的 Windows 桌面运维工作台。安装 exe 后双击运行，通过 SSH 连接 Linux；Electron 内置执行层自动启动，远端不安装管理面板。简体中文、浅色界面。
+StackPilot 是面向个人管理数台服务器的 Windows 桌面运维工作台。安装后双击启动，通过 SSH 完成网站托管、应用发布、数据库操作和主机管理。界面默认简体中文、浅色主题。
 
-## 0.2.0 的实际新增
+它把服务器连接、发布包识别、运行配置、执行日志、健康检查和版本回滚放在同一条操作流程中。
 
-- **两种工作方式**：简洁模式使用部署向导和概览；专业模式使用应用资源表、YAML 配置、日志/版本检查器及完整交互终端。
-- **真实 SSH PTY**：多会话、Ctrl+C、方向键、交互程序、窗口尺寸同步、切页保留会话。终端命令由操作者控制。
-- **Git / 本机源码 → 本机 Docker 构建 → SSH 交付**：HTTP(S) 分支拉取、临时 Token、提交号追溯；目标服务器接收镜像归档后直接运行，不参与编译。
-- **12 个构建方案**：静态前端、Node.js、Next.js、Nuxt、Maven、Gradle、Python、Go、.NET、PHP、Dockerfile、Compose。命令、子目录、输出目录和端口可修改。
-- **产物检测**：区分源码和 dist、SSR 和静态站点，识别 JAR/WAR/Compose/.NET 发布包等，提供配置建议。
-- **可复用配置**：YAML 导入/导出；修改已部署应用时复用远端产物，不必重新选择本机文件。导出配置不包含本机文件 ID、服务器 ID 或环境变量值。
-- **Compose 完整交付**：在本机构建/拉取服务镜像，连同相对挂载配置一起打包，再在服务器导入运行。
-- 保留正式回归测试和 GitHub CI，安装包不包含测试、样包或测试数据。
+## 已实现功能
 
-真实增量、开源项目对比与覆盖边界见 [0.2.0 报告](docs/V0.2-REPORT.md)。这些是相对 StackPilot 0.1.2 的工程增量，不宣称 Git 部署、终端或无 Agent 部署为行业首创。
+| 工作内容 | 实际功能 |
+|---|---|
+| 服务器连接 | 密码、私钥、主机指纹、服务器分组、跳板机、HTTP CONNECT / SOCKS5 代理；SSH 端口留空使用 22，端口映射场景填写实际端口 |
+| 前端网站 | dist 文件夹、ZIP、tar/tgz；Nginx、SPA 路由、子路径、资源缓存、Gzip、多域名、API 代理、WebSocket |
+| 后端发布 | JAR、WAR、Node.js、Python、Linux 可执行程序、.NET、容器镜像和 Compose；配置入口、环境变量、启动参数、工作目录、内存和 CPU |
+| Git 源码部署 | HTTP(S) 仓库、分支或标签、访问 Token、Commit 记录；本机 Docker 构建、镜像归档、SSH 上传和服务器导入运行 |
+| 版本管理 | 发布记录、健康检查、失败恢复、历史回滚、蓝绿发布、多实例、复用当前产物修改配置 |
+| 数据库 | MySQL/MariaDB、PostgreSQL、Redis、MongoDB、SQLite；连接、查询、浏览、账号与权限、单行编辑、备份、恢复和复制模板 |
+| 日常运维 | systemd 服务、容器、文件、进程、端口、磁盘、定时任务、资源曲线、应用检查、任务记录 |
+| 域名与证书 | Cloudflare、DNSPod、阿里云 DNS；自动解析、HTTP-01 证书申请和续期、上传证书、HTTPS 跳转 |
 
-## 界面
+## 两种工作方式
 
-以下为显式演示工作区，均非真实业务数据。
-
-**专业模式：应用资源、配置和发布历史。**
-
-![专业工作台](docs/images/professional.png)
-
-**简洁模式：资源概览和引导操作。**
+**简洁模式**围绕部署步骤组织操作：选择发布包、配置访问、设置运行选项、检查计划、执行发布。发布包检测会给出运行类型、入口和内容目录。
 
 ![简洁模式](docs/images/guided.png)
 
-## 开始使用
+**专业模式**使用应用资源表和配置检查器。选择应用后，可编辑 YAML、读取日志、查看发布历史、导出配置或打开 SSH 交互终端。终端支持多会话、Ctrl+C、方向键、窗口尺寸同步和切页保留。
 
-1. 安装 `StackPilot-Setup-0.2.0-x64.exe`，双击桌面快捷方式。
-2. 添加服务器，填写 IP/主机名、用户名及密码或私钥。**SSH 端口可留空**，按标准 22 连接；GPU 平台等端口映射场景填写实际端口。可配置跳板机、HTTP CONNECT / SOCKS5。
-3. 核验首次 SSH 主机指纹后连接。首次启动是真实空工作区，演示需单独开启并明确标记。
-4. 选择“上传发布包”，或“Git / 源码构建”。成品包部署不要求本机安装 Docker；本机构建源码需要已启动的 Docker Desktop。
-5. 按向导设置网站、端口、域名、API 代理和运行参数，检查计划后发布，在任务中心查看结果。
-6. 专业模式可直接编辑应用 YAML、查看日志和发布历史，或打开交互终端处理自定义工作。
+![专业工作台](docs/images/professional.png)
 
-安装包尚未进行商业代码签名。正式服务由 systemd / Docker 管理，关闭桌面不停止服务；本地监控和终端会在退出桌面后停止。
+两张截图使用内置演示工作区的数据。
 
-## 能力与范围
+## 两条部署流程
 
-| 模块 | 当前能力 |
+### 上传成品包
+
+1. 连接目标服务器。
+2. 选择 dist、压缩包、JAR、WAR、运行包、镜像或 Compose 项目。
+3. 根据识别结果设置目录、端口、域名、代理和启动参数。
+4. 查看部署计划，执行上传、配置和健康检查。
+5. 在发布记录中查看结果、更新配置或回滚版本。
+
+### 从 Git 或本机源码构建
+
+1. 填写 HTTP(S) 仓库地址及分支，或选择源码文件夹。
+2. 检测项目，选择构建方案，填写命令、输出目录和容器端口。
+3. 本机 Docker 完成编译和镜像归档。
+4. 选择服务器，通过 SSH 上传归档并导入运行。
+5. 查看关联的 Commit、构建命令、镜像 ID、产物校验值和发布版本。
+
+源码构建使用本机计算资源，目标服务器负责运行产物。构建需要启动 Docker Desktop；成品包向导直接使用已有发布包。
+
+## 与相关项目的区别
+
+| 项目 | 主要工作方式 | StackPilot 的实现重点 |
+|---|---|---|
+| [Electerm](https://github.com/electerm/electerm) | 桌面终端、SSH/SFTP 会话和远端文件操作 | 将 SSH 会话接入应用、网站、数据库和发布历史的图形操作流程 |
+| [1Panel](https://github.com/1Panel-dev/1Panel) | 部署在服务器上的网站、数据库与主机管理面板 | 控制面运行在 Windows 本机，通过 SSH 管理已有服务器 |
+| [Coolify](https://github.com/coollabsio/coolify) / [Dokploy](https://github.com/Dokploy/dokploy) | 服务器端应用平台、Git 发布、多服务和应用模板 | 成品包与源码共用发布工作台；源码在本机编译，再向服务器交付产物 |
+| [Kamal](https://github.com/basecamp/kamal) | SSH 与容器的命令行部署流程 | 把发布参数、配置复用、日志、健康检查和回滚做成可视化操作 |
+| [CapRover](https://github.com/caprover/caprover) | 服务器端容器应用平台，统一处理应用入口和证书 | 在个人桌面中集中管理成品包、原生服务、容器应用和数据库 |
+
+StackPilot 的产品路线是：**Windows 本地工作区、成品包与源码双入口、本机构建后交付、简洁与专业两种操作方式，以及网站和数据库的统一管理。**
+
+## 0.2.0 的工程增量
+
+- 专业模式改为资源表、YAML 配置、日志和发布记录检查器。
+- 增加 xterm / SSH2 真实交互终端。
+- 增加 Git 拉取、本机源码检测、构建任务、镜像归档和 SSH 导入链路。
+- 增加 12 个构建方案：静态前端、Node.js、Next.js、Nuxt、Maven、Gradle、Python、Go、.NET、PHP、Dockerfile、Compose。
+- 增加 YAML 导入/导出，以及复用远端产物修改配置的流程。
+- Compose 交付携带服务镜像、相对挂载文件和项目配置。
+- 增加正式回归测试、桌面流程测试和源码检查任务。
+
+代码入口与验证记录见 [0.2.0 实现报告](docs/V0.2-REPORT.md)。
+
+## 部署配置
+
+| 项目类型 | 配置入口 |
 |---|---|
-| SSH | 多服务器/分组、密码/私钥、跳板机、代理、可选端口、指纹记录、SFTP、隧道 |
-| 前端托管 | dist 文件夹、ZIP、tar/tgz、SPA、子路径、缓存、Gzip、多域名、多 API 代理、WebSocket |
-| 运行包 | JAR、可执行 WAR、Node.js、Python、Linux 二进制、.NET、Docker 镜像、Compose |
-| 源码 | 上述 12 个可修改方案；单服务镜像与 Compose 多服务归档交付 |
-| 发布 | systemd / Docker、启动参数/环境/工作目录、资源限制、健康检查、历史、失败恢复、蓝绿/多实例 |
-| 数据库 | MySQL/MariaDB、PostgreSQL、Redis、MongoDB、SQLite；连接/查询/浏览、受控编辑、安装、账号与权限、备份及部分恢复/升级/复制模板 |
-| 网站网络 | Nginx、Cloudflare/DNSPod/阿里云 DNS API、HTTP-01 证书及续期、上传证书、可选强制 HTTPS |
-| 主机 | 发现当前账号可见的 systemd 服务、Docker 容器、端口/进程/文件；启停、日志与配置管理 |
-| 监控 | 资源曲线、应用 HTTP 检查、本地通知、应用归档、定时备份、任务与审计 |
+| React / Vue / Angular 静态输出 | 设置构建输出目录，配置 SPA 路由、子路径和 API 代理 |
+| Next.js / Nuxt SSR | 选择对应服务端构建方案，设置启动命令与端口 |
+| Java | 原生成品包可指定 Java Home、JVM 参数；源码方案默认 Java 21 |
+| Python | 选择依赖安装命令及 ASGI / WSGI 模块；Django 可从 manage.py 识别模块名 |
+| Go / .NET | Go 默认生成 Linux 可执行文件；.NET 默认版本为 8，填写实际 DLL 名称 |
+| PHP / Laravel | PHP 8.3 / Apache；Laravel 使用 public 根目录，并配置 APP_KEY、存储和迁移命令 |
+| pnpm / yarn / monorepo | 设置仓库子目录、构建命令、输出目录，或使用项目 Dockerfile |
+| LFS / 子模块 | 在本机检出完整项目后，从源码文件夹入口构建 |
+| ARM / GPU / 系统库依赖 | 使用项目 Dockerfile 设置架构、运行环境和依赖 |
 
-“发现现有服务”不等于自动把任意历史项目改造成有发布历史的托管应用。未知项目的构建命令、数据目录、凭据和依赖仍需人工核对。不能承诺所有发行版、所有应用和全部运维问题自动解决。
+服务器环境通过 `/etc/os-release`、apt/dnf/yum、systemd、Nginx 和容器工具探测。镜像归档单文件上限为 2GB。蓝绿备用端口使用基础端口 +100。
 
-## 本轮测试
+数据库 SQL 工作台执行查询，单行编辑按唯一键定位。关系型数据库和 SQLite 的恢复入口创建新目标；Redis RDB 和 MongoDB archive 可通过引擎工具处理。同主机复制模板提供节点和连接配置。
 
-2026-11-11，Windows + Docker Desktop 29.6.2 / Compose 5.3.1：
+## 验证记录
 
-- 17 项正式回归通过，包含真实 SSH2 PTY、认证 Git HTTP 拉取、秘密不进入导出配置、源码/产物识别和端口处理。
-- 隔离 Linux SSH / Docker 集成覆盖镜像构建与上传导入、蓝绿、历史回滚、启动失败恢复、Compose 多服务/配置、复用发布、嵌套 dist 和 SPA 子路径。
-- 8 个模板实际构建并通过 HTTP 请求：React/Vite、Node.js、Next.js SSR、FastAPI、Go、ASP.NET Core 8、Spring Boot 3.5.7 / Maven / Java 21、PHP 8.3。
-- 原 Ubuntu 24.04.2 低内存主机仅执行轻量隔离回归；纳入检查的原服务进程、重启记录和文件校验值均不变，原业务响应保持一致，测试实例已清理。
+2026-11-11 已完成：
 
-0.1.2 的数据库、JAR 与 Docker 71 项历史验证单独保留在 [历史验证记录](docs/V0.1.2-VALIDATION.md)，不能算作本轮重新执行。Gradle、Nuxt、普通 WAR 及未列出的框架/发行版组合不据此宣称已实测。
+- 17 项正式回归，覆盖 SSH PTY、认证 Git HTTP、产物识别、配置导出、环境变量占位符和端口处理。
+- 13 项 Linux SSH / 容器集成检查，覆盖上传导入、蓝绿、回滚、启动失败恢复、Compose、配置复用、嵌套 dist 和 SPA 子路径。
+- 8 类构建模板的真实构建与 HTTP 检查：React/Vite、Node.js、Next.js SSR、FastAPI、Go、ASP.NET Core 8、Spring Boot 3.5.7 / Maven / Java 21、PHP 8.3。
+- 真实桌面中的 Git 拉取、构建、修改选项后再次构建，以及产物进入发布向导。
+- Ubuntu 24.04.2 主机的隔离发布回归，受检业务文件校验值、服务进程和重启记录与基线一致。
 
-复现步骤见 [tests/README.md](tests/README.md)。GitHub CI 配置已提供；实际云端运行结果见 [Actions](https://github.com/clusterstar1229/StackPilot/actions)。
+0.1.2 的 71 项数据库、JAR 与容器验证记录见 [历史记录](docs/V0.1.2-VALIDATION.md)。复现命令见 [测试说明](tests/README.md)，云端结果见 [Source checks](https://github.com/clusterstar1229/StackPilot/actions/runs/43017922257)。
 
-## 需要知道的限制
+## 安装与开发
 
-- 桌面目前只交付 Windows x64，自动化主要面向有 systemd 的 Linux。Ubuntu 24.04 已实测；其他 Ubuntu、CentOS/RHEL 的软件源及服务布局需验证。
-- 本机构建默认使用当前 Docker 的 Linux 架构；ARM、多架构、GPU/CUDA、特殊系统库需要项目 Dockerfile 与相应构建环境。镜像归档单文件上限 2GB。
-- Git 当前为 HTTP(S)，不自动处理 Git LFS 和子模块；可以先在本机检出完整源码再选择文件夹。复杂 monorepo、pnpm/yarn workspace、私有依赖源需调整命令或 Dockerfile。
-- SSR 需要后端运行，不能把 Next/Nuxt 直接当普通 dist。Python 复杂 pyproject/Poetry 项目需配置依赖命令；PHP 额外扩展和 Laravel 密钥/迁移需按项目设置。
-- 源码 Java 默认 Java 21，.NET 默认 8，Node 默认 22；其他版本可使用项目 Dockerfile。原生 Java 可选择独立 Java Home。
-- 普通 WAR 使用 Docker/Tomcat 10（Jakarta）；旧 javax 项目需要兼容容器。原生 WAR 仅适用于可执行 WAR。Windows exe 不能直接作为 Linux 产物运行。
-- Docker Compose 需要目标服务器具备 Docker Compose；按可信项目的挂载和网络配置执行。自动回滚恢复程序/配置，不回滚外部数据库或业务卷的数据。
-- 数据库自动安装需要已有 Docker。自动升级只处理本系统创建的独立容器及同主版本升级；复制模板在同主机，不能替代跨主机故障容灾。
-- 通用恢复入口支持关系型单库 SQL/SQL.GZ 和 SQLite，创建新目标；Redis/MongoDB 二进制恢复使用引擎工具。数据库能力不覆盖所有引擎和所有集群形态。
-- 自动 DNS 需要域名解析权限，备案号不能替代授权。自动证书使用 HTTP-01，需要正确解析及公网 80 可达；泛域名可上传已有证书。
-- 专业终端是完整 Shell。图形界面保留基础确认、凭据加密和文件备份，不提供服务器重启/删库/删卷按钮。
+下载 Windows x64 安装包，按向导安装后启动。Electron 自带本地执行环境。SSH 密码、私钥和保存的环境变量使用当前 Windows 账户加密，工作区位于 `%APPDATA%\StackPilot\workspace`。
 
-## 已有业务的隔离方式
-
-需要在已有业务主机验证时，使用全新应用名、专用根目录和空闲端口，选择“临时隔离 Nginx”，关闭“安装缺失环境”。它只监听本机，使用独立配置/PID/日志，通过 SSH 隧道预览，不 reload 系统 Nginx。
-
-工作区默认 `%APPDATA%\StackPilot\workspace`，凭据与保存的环境变量通过当前 Windows 账户 DPAPI 加密。也可用 `StackPilot.exe --user-data-dir=C:\自选绝对路径` 指定独立工作区。
-
-## 源码开发与开源交付
+开发环境使用 Node.js 22.12+ 和 Git：
 
 ```powershell
+git clone https://github.com/clusterstar1229/StackPilot.git
+cd StackPilot
 npm ci
 npm test
 npm run dev
@@ -103,10 +125,12 @@ npm run notices
 npm run dist
 ```
 
-开发需要 Node.js 22.12+。`npm run dist` 在上一级“安装包”生成 NSIS exe。终端用户不需要安装 Node.js。
+`npm run dist` 在上一级“安装包”目录生成 Windows NSIS 安装文件。应用发布后由远端 systemd / 容器管理；本地资源采样、通知和交互会话随桌面应用运行。
 
-`src` 为界面，`electron` 为本地执行层，`shared` 为模型和检测，`tests` 为正式回归与可选 Docker 集成，`.github/workflows` 为 CI。
+| 位置 | 内容 |
+|---|---|
+| GitHub | 软件源码、文档、界面素材、正式测试和源码检查任务 |
+| 下载服务器 | Windows 安装包、SHA-256 校验清单和版本信息 |
+| GitHub 临时 Windows / Ubuntu 测试机 | 执行源码回归和编译 |
 
-发行渠道为 **GitHub 存源码、独立静态下载服务存安装包**。GitHub CI 只测试和编译源码，不生成或上传安装包产物，不构建或推送 Docker/系统镜像；Windows/Ubuntu 是 GitHub 的临时测试机系统。本源码包包含 MIT、贡献说明、依赖许可证记录及 CI；公开仓库为 [clusterstar1229/StackPilot](https://github.com/clusterstar1229/StackPilot)，安装包由上方独立下载站提供。
-
-参考见 [REFERENCES.md](docs/REFERENCES.md)。本项目未复制对比面板的业务源码；依赖遵循各自 LICENSE，记录见 `THIRD_PARTY_NOTICES.json`。
+业务源码采用 [MIT](LICENSE)，第三方依赖记录见 [THIRD_PARTY_NOTICES.json](THIRD_PARTY_NOTICES.json)。参考项目与接口依据见 [REFERENCES.md](docs/REFERENCES.md)。

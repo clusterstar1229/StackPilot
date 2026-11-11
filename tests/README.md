@@ -1,12 +1,20 @@
-# 回归测试
+# 测试说明
 
-`npm test` 运行不依赖真实服务器的正式回归，包括真实 SSH2 协议/PTY 和带认证的本机 Git HTTP 服务。开发测试需要 Git；终端用户安装软件后拉取仓库不依赖系统 Git。
+## 源码回归
 
-`npm run build` 包含 TypeScript 检查、前端及 Electron 主进程构建。GitHub CI 仅在临时 Windows 和 Ubuntu 测试机上执行回归与源码编译；不生成或上传安装包，不构建或推送 Docker/系统镜像。需要安装包时在 Windows 本机手动执行 `npm run dist`；正式下载仍由独立服务器提供。
+```powershell
+npm ci
+npm test
+npm run build
+```
 
-## SSH / Compose 隔离集成
+17 项正式回归使用本机 SSH2 服务与认证 Git HTTP 服务，验证 PTY、Unicode、输入、尺寸、Commit、凭据保存、产物识别、配置和端口。开发测试需要 Git。
 
-在已启动 Docker Desktop 的 Windows 终端执行：
+GitHub 的 Source checks 在临时 Windows/Ubuntu 测试机执行回归与源码编译。正式安装包由下载站提供。
+
+## SSH 与 Compose 集成
+
+在启动 Docker Desktop 的 Windows 终端执行：
 
 ```powershell
 docker pull python:3.13-slim
@@ -17,17 +25,26 @@ npm run test:integration
 docker image rm stackpilot-qa-fixture:0.2.0
 ```
 
-测试只连接自己创建的 Linux 容器，使用随机口令、独立内层 Docker 数据卷和私有 cgroup namespace。外层 fixture 使用 privileged 运行 Docker-in-Docker；它是本机测试设施，不上传至业务服务器。测试结束删除自身容器、卷和临时文件。终止测试进程后如需手动清理，仅选择带 `stackpilot.test` 标签的本次测试容器及对应名称卷，不要全局 prune。
+fixture 使用随机 SSH 口令、私有 cgroup namespace 和独立内层数据卷。外层容器分配 privileged 以运行容器引擎。测试完成后删除对应容器、卷和临时文件。
 
-覆盖源码镜像经 SSH 导入、蓝绿切换、历史回滚、Compose 多镜像与相对配置、配置复用以及嵌套 dist/子路径 SPA。
+13 项检查覆盖镜像构建、SSH 导入、蓝绿、回滚、失败恢复、Compose 多服务及相对文件、配置复用、嵌套 dist 和 SPA 子路径。
 
-## 语言构建模板实测
+## 构建方案实测
 
 ```powershell
 $env:STACKPILOT_PROFILE_REPORT="$PWD/profiles-results.json"
 npm run test:profiles
 ```
 
-这会联网下载官方构建镜像及项目依赖，实际构建并请求 React/Vite、Node.js、Next.js SSR、FastAPI、Go、ASP.NET Core、Spring Boot/Maven 和 PHP。可用 `STACKPILOT_PROFILES=next,python` 选择部分场景。只删除测试自行生成的镜像标签/容器；共用的官方基础镜像保留给操作者按需清理。它不是所有框架、系统与架构的兼容性认证。
+脚本下载构建环境与依赖，运行 React/Vite、Node.js、Next.js SSR、FastAPI、Go、ASP.NET Core、Spring Boot/Maven、PHP 和内容子目录用例。可用 `STACKPILOT_PROFILES=next,python` 选择项目。生成的标签和容器随测试清理；基础镜像和构建缓存按本次使用记录清理。
 
-另有 `dockerfile` 场景验证运行包的内容子目录与入口一致。桌面检查可在 Windows 上先 `npm run build` 后运行 `npm run test:ui`，需要 Docker 和 Git。它使用独立工作区及本机临时 Git HTTP 服务，验证模式区别、源码拉取/构建、配置修改后重新构建与产物进入发布向导，不连接业务服务器。设置 `STACKPILOT_UI_REPORT_DIR` 可保存演示截图与结果；参数传入解包后的 exe 可检查实际安装载荷，`STACKPILOT_UI_SKIP_BUILD=1` 只检查桌面与布局。
+## 桌面流程
+
+```powershell
+npm run build
+npm run test:ui
+```
+
+Windows 桌面测试使用独立工作区和本机 Git HTTP 服务，检查模式切换、源码拉取、构建、修改选项再次构建和产物进入发布向导。需要 Git 和 Docker Desktop。
+
+`STACKPILOT_UI_REPORT_DIR` 设置截图与记录位置；传入解包后的 exe 可检查安装载荷；`STACKPILOT_UI_SKIP_BUILD=1` 选择布局和启动检查。
