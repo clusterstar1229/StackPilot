@@ -1,5 +1,7 @@
-name: Build and regression checks
+name: Source checks
 on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
 jobs:
   checks:
     strategy:
@@ -15,18 +17,3 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
-  windows-installer:
-    runs-on: windows-latest
-    needs: checks
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run dist
-      - uses: actions/upload-artifact@v4
-        with:
-          name: StackPilot-Windows
-          path: ../安装包/StackPilot-Setup-*-x64.exe

@@ -107,6 +107,6 @@ npm run dist
 
 `src` 为界面，`electron` 为本地执行层，`shared` 为模型和检测，`tests` 为正式回归与可选 Docker 集成，`.github/workflows` 为 CI。
 
-开源计划为 **GitHub 存源码、独立静态下载服务存安装包**。本源码包已经包含 MIT、贡献说明、依赖许可证记录及 CI；公开仓库为 [clusterstar1229/StackPilot](https://github.com/clusterstar1229/StackPilot)，安装包由上方独立下载站提供。
+发行渠道为 **GitHub 存源码、独立静态下载服务存安装包**。GitHub CI 只测试和编译源码，不生成或上传安装包产物，不构建或推送 Docker/系统镜像；Windows/Ubuntu 是 GitHub 的临时测试机系统。本源码包包含 MIT、贡献说明、依赖许可证记录及 CI；公开仓库为 [clusterstar1229/StackPilot](https://github.com/clusterstar1229/StackPilot)，安装包由上方独立下载站提供。
 
 参考见 [REFERENCES.md](docs/REFERENCES.md)。本项目未复制对比面板的业务源码；依赖遵循各自 LICENSE，记录见 `THIRD_PARTY_NOTICES.json`。

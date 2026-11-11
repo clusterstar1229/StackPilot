@@ -2,7 +2,7 @@
 
 `npm test` 运行不依赖真实服务器的正式回归，包括真实 SSH2 协议/PTY 和带认证的本机 Git HTTP 服务。开发测试需要 Git；终端用户安装软件后拉取仓库不依赖系统 Git。
 
-`npm run build` 包含 TypeScript 检查、前端及 Electron 主进程构建。GitHub CI 在 Windows 和 Ubuntu 上执行上述两项，再生成 Windows 安装包；上传到 GitHub 后才能形成实际 CI 运行记录。
+`npm run build` 包含 TypeScript 检查、前端及 Electron 主进程构建。GitHub CI 仅在临时 Windows 和 Ubuntu 测试机上执行回归与源码编译；不生成或上传安装包，不构建或推送 Docker/系统镜像。需要安装包时在 Windows 本机手动执行 `npm run dist`；正式下载仍由独立服务器提供。
 
 ## SSH / Compose 隔离集成
 
