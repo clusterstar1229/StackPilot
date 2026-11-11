@@ -1,0 +1,107 @@
+{
+  "name": "stackpilot-desktop",
+  "version": "0.2.0",
+  "description": "栈桥 StackPilot — 本地 SSH 运维工作台",
+  "author": "StackPilot",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "dist-electron/main.cjs",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build && node scripts/build.mjs",
+    "dist": "npm run build && electron-builder --win nsis --x64",
+    "pack": "npm run build && electron-builder --win --dir --x64",
+    "start": "electron .",
+    "test": "tsx --test tests/*.test.ts",
+    "notices": "node scripts/notices.mjs",
+    "test:integration": "tsx tests/integration/run.ts",
+    "test:profiles": "tsx tests/integration/profiles.ts",
+    "test:ui": "node tests/integration/ui.mjs"
+  },
+  "dependencies": {
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "isomorphic-git": "^1.44.12",
+    "lucide-react": "^0.468.0",
+    "mongodb": "^7.8.0",
+    "mysql2": "^3.15.0",
+    "pg": "^8.16.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "redis": "^6.3.1",
+    "socks": "^2.8.7",
+    "ssh2": "^1.17.0",
+    "tar": "^7.5.0",
+    "yaml": "^2.8.0",
+    "yauzl": "^3.2.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "@types/pg": "^8.15.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/ssh2": "^1.15.0",
+    "@types/yauzl": "^2.10.3",
+    "@vitejs/plugin-react": "^5.1.0",
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.27.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.2.0"
+  },
+  "build": {
+    "appId": "cn.stackpilot.desktop",
+    "productName": "StackPilot",
+    "directories": {
+      "output": "../安装包",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json",
+      "docs/**/*",
+      "README.md",
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.json",
+      "!**/{test,tests,__tests__,fixtures}",
+      "!**/{test,tests,__tests__,fixtures}/**/*",
+      "!**/*.test.*",
+      "!**/*.spec.*",
+      "!**/{testing,testdata}",
+      "!**/{testing,testdata}/**/*",
+      "!**/{test,tests,spec}.{js,cjs,mjs,ts,tsx,json}",
+      "!**/test.util.*",
+      "!node_modules/react-dom/test-utils.js",
+      "!node_modules/react-dom/cjs/react-dom-test-utils.*",
+      "!node_modules/yaml/dist/test-events.*"
+    ],
+    "asar": true,
+    "npmRebuild": false,
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico",
+      "artifactName": "StackPilot-Setup-${version}-x64.exe",
+      "signAndEditExecutable": true,
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "栈桥 StackPilot",
+      "installerLanguages": [
+        "zh_CN",
+        "en_US"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

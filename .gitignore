@@ -1,0 +1,11 @@
+node_modules/
+dist/
+dist-electron/
+*.log
+.qa/
+work/
+*-results.json
+*.exe
+*.blockmap
+.env
+.env.local

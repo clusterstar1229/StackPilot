@@ -1,0 +1,10 @@
+import { spawn } from 'node:child_process';
+import { build } from 'esbuild';
+import { createServer } from 'vite';
+await import('./build.mjs');
+const server = await createServer(); await server.listen();
+const { default: electron } = await import('electron');
+const env = { ...process.env, STACKPILOT_DEV: '1' }; delete env.ELECTRON_RUN_AS_NODE;
+const proc = spawn(electron, ['.'], { env, stdio: 'inherit', windowsHide: true });
+proc.on('exit', async code => { await server.close(); process.exit(code ?? 0); });
+process.on('SIGINT', () => proc.kill());

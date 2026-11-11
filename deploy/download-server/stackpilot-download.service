@@ -1,0 +1,29 @@
+[Unit]
+Description=StackPilot installer downloads (independent nginx)
+After=network.target
+
+[Service]
+Type=forking
+User=www-data
+Group=www-data
+RuntimeDirectory=stackpilot-download
+LogsDirectory=stackpilot-download
+PIDFile=/run/stackpilot-download/nginx.pid
+ExecStartPre=/usr/sbin/nginx -t -p /srv/stackpilot-download/ -c /etc/stackpilot-download/nginx.conf
+ExecStart=/usr/sbin/nginx -p /srv/stackpilot-download/ -c /etc/stackpilot-download/nginx.conf
+ExecReload=/usr/sbin/nginx -p /srv/stackpilot-download/ -c /etc/stackpilot-download/nginx.conf -s reload
+ExecStop=/usr/sbin/nginx -p /srv/stackpilot-download/ -c /etc/stackpilot-download/nginx.conf -s quit
+Restart=on-failure
+RestartSec=5
+MemoryMax=64M
+CPUQuota=20%
+TasksMax=16
+Nice=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/run/stackpilot-download /var/log/stackpilot-download
+
+[Install]
+WantedBy=multi-user.target
